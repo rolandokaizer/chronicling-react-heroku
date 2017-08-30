@@ -36,7 +36,7 @@ class SearchBar extends Component {
         return (
             <AutoComplete
                 dataSource={this.props.suggestions}
-                style={{ width: 600, margin: '30px 0 10px 0' }}
+                style={{ width: 500, margin: '30px 0 10px 0' }}
                 onSelect={this.onSelect}
                 onSearch={_.debounce((value)=>{this.handleSearch(value)}, 300)}
                 placeholder="Search headlines..."

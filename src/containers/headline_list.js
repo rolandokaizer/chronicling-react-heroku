@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {fetchHeadline} from "../actions/index";
 import Headline from '../components/headline';
 import Pagination from 'antd/lib/pagination';
 import 'antd/lib/pagination/style/css';
-import {fetchHeadline} from "../actions/index";
+import Button from 'antd/lib/button';
+import 'antd/lib/button/style/css';
+import Icon from 'antd/lib/icon';
+import 'antd/lib/icon/style/css';
 
 class HeadlineList extends Component {
     constructor(props) {
@@ -11,6 +15,8 @@ class HeadlineList extends Component {
 
         this.onChange = this.onChange.bind(this);
         this.renderHeadline = this.renderHeadline.bind(this);
+        this.handlePrevClick = this.handlePrevClick.bind(this);
+        this.handleNextClick = this.handleNextClick.bind(this);
     }
 
     renderHeadline(item, index) {
@@ -41,23 +47,58 @@ class HeadlineList extends Component {
         this.props.fetchHeadline(this.props.headline.terms, page);
     }
 
-    render() {
-        const style = {
-            marginBottom: 10
-        };
+    handlePrevClick(){
+        this.props.fetchHeadline(this.props.headline.terms, (this.props.headline.page - 1));
+    }
 
+    handleNextClick(){
+        this.props.fetchHeadline(this.props.headline.terms, (this.props.headline.page + 1));
+    }
+
+    render() {
         if (this.props.headline.headline.items !== undefined) {
+            let isPrevDisabled = false;
+            let isNextDisabled = false;
+
+            if(this.props.headline.page === 1){
+                isPrevDisabled = true;
+
+                if(this.props.headline.headline.totalItems <= 10){
+                    isNextDisabled = true;
+                }
+            }else{
+                if(Math.ceil(this.props.headline.headline.totalItems / 10) === this.props.headline.page){
+                    isNextDisabled = true;
+                }
+            }
+
             return (
                 <div>
-                    <div style={style}>
+                    <div style={{marginBottom: 10}}>
                         {this.props.headline.headline.items.map(this.renderHeadline)}
                     </div>
                     <Pagination
+                        style={{marginTop: 30, textAlign: 'center'}}
                         onChange={this.onChange}
                         pageSize={10}
                         defaultCurrent={1}
                         current={this.props.headline.page}
                         total={this.props.headline.headline.totalItems}/>
+                    <div style={{marginTop: 10, textAlign: 'center'}}>
+                        <Button
+                            type="primary"
+                            disabled={isPrevDisabled}
+                            onClick={this.handlePrevClick}>
+                            <Icon type="left" /> Newer
+                        </Button>
+                        <div style={{display: 'inline-block', width: 150}}>&nbsp;</div>
+                        <Button
+                            type="primary"
+                            disabled={isNextDisabled}
+                            onClick={this.handleNextClick}>
+                            Older <Icon type="right" />
+                        </Button>
+                    </div>
                 </div>
             );
         } else {
